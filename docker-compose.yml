@@ -1,0 +1,25 @@
+services:
+  budget-flow:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        # URL de l'instance PocketBase
+        - VITE_POCKETBASE_URL=${VITE_POCKETBASE_URL:-http://127.0.0.1:8090}
+    container_name: budget-flow
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+
+  # Optionnel : décommentez si vous souhaitez héberger PocketBase dans le même conteneur LXC
+  # pocketbase:
+  #   image: ghcr.io/muchobien/pocketbase:latest
+  #   container_name: budget-flow-pocketbase
+  #   restart: unless-stopped
+  #   ports:
+  #     - "8090:8090"
+  #   volumes:
+  #     - ./pb_data:/pb_data
+  #   command:
+  #     - --dir=/pb_data
+  #     - --http=0.0.0.0:8090
