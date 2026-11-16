@@ -10,10 +10,13 @@ interface UIState {
   selectedMonth: string       // MM/YYYY
   currency: CurrencyCode
   language: Language
+  mobileMenuOpen: boolean
   setTheme: (theme: 'light' | 'dark') => void
   setSelectedMonth: (month: string) => void
   setCurrency: (currency: CurrencyCode) => void
   setLanguage: (language: Language) => void
+  setMobileMenuOpen: (open: boolean) => void
+  toggleMobileMenu: () => void
 }
 
 export const useStore = create<UIState>()(
@@ -23,6 +26,7 @@ export const useStore = create<UIState>()(
       selectedMonth: getCurrentMois(),
       currency: DEFAULT_CURRENCY,
       language: DEFAULT_LANGUAGE,
+      mobileMenuOpen: false,
 
       setTheme: (theme) => set({ theme }),
       setSelectedMonth: (selectedMonth) => set({ selectedMonth }),
@@ -36,6 +40,8 @@ export const useStore = create<UIState>()(
         setActiveLanguage(resolved)
         set({ language: resolved })
       },
+      setMobileMenuOpen: (mobileMenuOpen) => set({ mobileMenuOpen }),
+      toggleMobileMenu: () => set((state) => ({ mobileMenuOpen: !state.mobileMenuOpen })),
     }),
     {
       name: 'budget-familial-ui',

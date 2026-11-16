@@ -6,6 +6,7 @@ import Dashboard from '@/pages/Dashboard'
 import Transactions from '@/pages/Transactions'
 import Import from '@/pages/Import'
 import Settings from '@/pages/Settings'
+import Security from '@/pages/Security'
 import SetupWizard from '@/components/onboarding/SetupWizard'
 import AuthScreen from '@/components/auth/AuthScreen'
 import {
@@ -187,6 +188,7 @@ export default function App() {
             <Route path="transactions" element={<Transactions />} />
             <Route path="import" element={<Import />} />
             <Route path="settings" element={<Settings />} />
+            <Route path="security" element={<Security />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Route>
         </Routes>

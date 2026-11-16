@@ -27,7 +27,13 @@ import {
 import pb from '@/lib/pocketbase'
 import { useTranslation } from '@/i18n'
 
-export default function SecurityManager() {
+export type SecurityTab = 'account' | 'household'
+
+interface SecurityManagerProps {
+  activeTab?: SecurityTab
+}
+
+export default function SecurityManager({ activeTab = 'account' }: SecurityManagerProps) {
   const { t } = useTranslation()
   const [currentUser, setCurrentUser] = useState<AuthUser | null>(getCurrentUser())
   const [householdUsers, setHouseholdUsers] = useState<AuthUser[]>([])
@@ -213,173 +219,176 @@ export default function SecurityManager() {
         </div>
       )}
 
-      {/* 1. Compte actuel & Déconnexion */}
-      <div className="card p-5 border-l-4 border-l-primary-500 flex items-center justify-between flex-wrap gap-4">
-        <div className="flex items-center gap-3">
-          <div className="p-2.5 rounded-xl bg-primary-100 dark:bg-primary-950/50 text-primary-600 dark:text-primary-400">
-            <ShieldCheck className="w-5 h-5" />
-          </div>
-          <div>
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
-              {t('security.currentAccountTitle')}
-            </h3>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-              {t('security.connectedAs')}{' '}
-              <span className="font-semibold text-gray-800 dark:text-gray-200">
-                {currentUser?.name ? `${currentUser.name} (${currentUser.email})` : currentUser?.email}
-              </span>
-            </p>
-            <p className="text-[11px] text-gray-400 mt-0.5">{t('security.currentAccountDesc')}</p>
-          </div>
-        </div>
+      {activeTab === 'account' && (
+        <div className="space-y-6 animate-fade-in">
+          {/* 1. Compte actuel & Déconnexion */}
+          <div className="card p-5 border-l-4 border-l-primary-500 flex items-center justify-between flex-wrap gap-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 rounded-xl bg-primary-100 dark:bg-primary-950/50 text-primary-600 dark:text-primary-400">
+                <ShieldCheck className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
+                  {t('security.currentAccountTitle')}
+                </h3>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                  {t('security.connectedAs')}{' '}
+                  <span className="font-semibold text-gray-800 dark:text-gray-200">
+                    {currentUser?.name ? `${currentUser.name} (${currentUser.email})` : currentUser?.email}
+                  </span>
+                </p>
+                <p className="text-[11px] text-gray-400 mt-0.5">{t('security.currentAccountDesc')}</p>
+              </div>
+            </div>
 
-        <button
-          type="button"
-          onClick={logoutUser}
-          className="btn-danger text-xs py-2 px-3.5 flex items-center gap-1.5"
-          title={t('auth.logoutTitle')}
-        >
-          <LogOut className="w-3.5 h-3.5" />
-          <span>{t('auth.logout')}</span>
-        </button>
-      </div>
-
-      {/* 2. Clé de secours personnelle (Recovery Key) */}
-      <div className="card p-5 space-y-4">
-        <div className="flex items-start justify-between flex-wrap gap-3">
-          <div className="flex items-start gap-3">
-            <div className="p-2 bg-emerald-100 dark:bg-emerald-950/40 rounded-xl text-emerald-600 dark:text-emerald-400 shrink-0">
-              <KeyRound className="w-4 h-4" />
-            </div>
-            <div>
-              <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
-                {t('security.recoveryTitle')}
-              </h3>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 max-w-xl leading-relaxed">
-                {t('security.recoveryDesc')}
-              </p>
-            </div>
-          </div>
-
-          <button
-            type="button"
-            onClick={handleGenerateKey}
-            disabled={generatingKey}
-            className="btn-primary text-xs py-2 px-3.5 flex items-center gap-1.5 shrink-0"
-          >
-            <KeyRound className="w-3.5 h-3.5" />
-            <span>
-              {generatingKey ? t('security.generatingKey') : t('security.generateNewKeyBtn')}
-            </span>
-          </button>
-        </div>
-
-        {newRecoveryKey && (
-          <div className="p-4 rounded-xl bg-gray-50 dark:bg-gray-900 border border-emerald-200 dark:border-emerald-800/60 space-y-3 animate-fade-in">
-            <div className="p-3 rounded-lg bg-gray-900 dark:bg-black text-emerald-400 font-mono text-xs sm:text-sm break-all text-center select-all tracking-wider">
-              {newRecoveryKey}
-            </div>
-            <div className="flex items-center gap-2 flex-wrap">
-              <button
-                type="button"
-                onClick={() => handleCopyKey(newRecoveryKey, false)}
-                className="btn-secondary text-xs py-1.5 px-3 flex items-center gap-1.5"
-              >
-                {copiedKey ? (
-                  <>
-                    <Check className="w-3.5 h-3.5 text-emerald-500" />
-                    <span className="text-emerald-600 dark:text-emerald-400">
-                      {t('auth.copiedKey')}
-                    </span>
-                  </>
-                ) : (
-                  <>
-                    <Copy className="w-3.5 h-3.5" />
-                    <span>{t('auth.copyKey')}</span>
-                  </>
-                )}
-              </button>
-              <button
-                type="button"
-                onClick={() => handleDownloadKey(currentUser?.email || 'user', newRecoveryKey)}
-                className="btn-secondary text-xs py-1.5 px-3 flex items-center gap-1.5"
-              >
-                <Download className="w-3.5 h-3.5" />
-                <span>{t('auth.downloadKey')}</span>
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* 3. Changement de mot de passe */}
-        <div className="card p-5 space-y-4">
-          <div className="flex items-center gap-2.5">
-            <div className="p-2 bg-amber-100 dark:bg-amber-950/40 rounded-xl text-amber-600 dark:text-amber-400">
-              <Lock className="w-4 h-4" />
-            </div>
-            <div>
-              <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
-                {t('security.changePwdTitle')}
-              </h3>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
-                {t('security.changePwdDesc')}
-              </p>
-            </div>
-          </div>
-
-          <form onSubmit={handleUpdatePassword} className="space-y-3">
-            <div>
-              <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-                {t('security.oldPwdLabel')}
-              </label>
-              <input
-                type="password"
-                required
-                value={oldPassword}
-                onChange={e => setOldPassword(e.target.value)}
-                className="input text-xs py-2"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-                {t('security.newPwdLabel')}
-              </label>
-              <input
-                type="password"
-                required
-                minLength={8}
-                value={newPassword}
-                onChange={e => setNewPassword(e.target.value)}
-                className="input text-xs py-2"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-                {t('security.confirmNewPwdLabel')}
-              </label>
-              <input
-                type="password"
-                required
-                minLength={8}
-                value={confirmNewPassword}
-                onChange={e => setConfirmNewPassword(e.target.value)}
-                className="input text-xs py-2"
-              />
-            </div>
             <button
-              type="submit"
-              disabled={updatingPwd}
-              className="btn-primary w-full text-xs py-2 font-semibold"
+              type="button"
+              onClick={logoutUser}
+              className="btn-danger text-xs py-2 px-3.5 flex items-center gap-1.5"
+              title={t('auth.logoutTitle')}
             >
-              {updatingPwd ? t('security.updatingPwd') : t('security.updatePwdBtn')}
+              <LogOut className="w-3.5 h-3.5" />
+              <span>{t('auth.logout')}</span>
             </button>
-          </form>
-        </div>
+          </div>
 
-        {/* 4. Membres du foyer (Foyer partagé) */}
-        <div className="card p-5 space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+            {/* 2. Changement de mot de passe */}
+            <div className="card p-5 space-y-4">
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 bg-amber-100 dark:bg-amber-950/40 rounded-xl text-amber-600 dark:text-amber-400">
+                  <Lock className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
+                    {t('security.changePwdTitle')}
+                  </h3>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    {t('security.changePwdDesc')}
+                  </p>
+                </div>
+              </div>
+
+              <form onSubmit={handleUpdatePassword} className="space-y-3">
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    {t('security.oldPwdLabel')}
+                  </label>
+                  <input
+                    type="password"
+                    required
+                    value={oldPassword}
+                    onChange={e => setOldPassword(e.target.value)}
+                    className="input text-xs py-2"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    {t('security.newPwdLabel')}
+                  </label>
+                  <input
+                    type="password"
+                    required
+                    minLength={8}
+                    value={newPassword}
+                    onChange={e => setNewPassword(e.target.value)}
+                    className="input text-xs py-2"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    {t('security.confirmNewPwdLabel')}
+                  </label>
+                  <input
+                    type="password"
+                    required
+                    minLength={8}
+                    value={confirmNewPassword}
+                    onChange={e => setConfirmNewPassword(e.target.value)}
+                    className="input text-xs py-2"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={updatingPwd}
+                  className="btn-primary w-full text-xs py-2 font-semibold"
+                >
+                  {updatingPwd ? t('security.updatingPwd') : t('security.updatePwdBtn')}
+                </button>
+              </form>
+            </div>
+
+            {/* 3. Clé de secours personnelle (Recovery Key) */}
+            <div className="card p-5 space-y-4">
+              <div className="flex items-start gap-3">
+                <div className="p-2 bg-emerald-100 dark:bg-emerald-950/40 rounded-xl text-emerald-600 dark:text-emerald-400 shrink-0">
+                  <KeyRound className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
+                    {t('security.recoveryTitle')}
+                  </h3>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 leading-relaxed">
+                    {t('security.recoveryDesc')}
+                  </p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={handleGenerateKey}
+                disabled={generatingKey}
+                className="btn-primary w-full text-xs py-2 px-3.5 flex items-center justify-center gap-1.5"
+              >
+                <KeyRound className="w-3.5 h-3.5" />
+                <span>
+                  {generatingKey ? t('security.generatingKey') : t('security.generateNewKeyBtn')}
+                </span>
+              </button>
+
+              {newRecoveryKey && (
+                <div className="p-4 rounded-xl bg-gray-50 dark:bg-gray-900 border border-emerald-200 dark:border-emerald-800/60 space-y-3 animate-fade-in">
+                  <div className="p-3 rounded-lg bg-gray-900 dark:bg-black text-emerald-400 font-mono text-xs sm:text-sm break-all text-center select-all tracking-wider">
+                    {newRecoveryKey}
+                  </div>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <button
+                      type="button"
+                      onClick={() => handleCopyKey(newRecoveryKey, false)}
+                      className="btn-secondary text-xs py-1.5 px-3 flex items-center gap-1.5"
+                    >
+                      {copiedKey ? (
+                        <>
+                          <Check className="w-3.5 h-3.5 text-emerald-500" />
+                          <span className="text-emerald-600 dark:text-emerald-400">
+                            {t('auth.copiedKey')}
+                          </span>
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-3.5 h-3.5" />
+                          <span>{t('auth.copyKey')}</span>
+                        </>
+                      )}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDownloadKey(currentUser?.email || 'user', newRecoveryKey)}
+                      className="btn-secondary text-xs py-1.5 px-3 flex items-center gap-1.5"
+                    >
+                      <Download className="w-3.5 h-3.5" />
+                      <span>{t('auth.downloadKey')}</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'household' && (
+        <div className="card p-5 space-y-5 animate-fade-in">
           <div className="flex items-center gap-2.5">
             <div className="p-2 bg-indigo-100 dark:bg-indigo-950/40 rounded-xl text-indigo-600 dark:text-indigo-400">
               <Users className="w-4 h-4" />
@@ -395,11 +404,11 @@ export default function SecurityManager() {
           </div>
 
           {householdUsers.length > 0 && (
-            <div className="space-y-1.5">
+            <div className="space-y-2">
               {householdUsers.map(u => (
                 <div
                   key={u.id}
-                  className="flex items-center justify-between gap-2 px-3 py-2 rounded-xl bg-gray-50 dark:bg-gray-800/70 text-xs"
+                  className="flex items-center justify-between gap-2 px-3.5 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800/70 text-xs"
                 >
                   <div className="truncate">
                     <span className="font-semibold text-gray-800 dark:text-gray-200">
@@ -426,44 +435,46 @@ export default function SecurityManager() {
             </div>
           )}
 
-          <form onSubmit={handleAddHouseholdMember} className="space-y-2.5 pt-2 border-t border-gray-100 dark:border-gray-800">
-            <div className="relative">
-              <User className="w-3.5 h-3.5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
-              <input
-                type="text"
-                value={memberName}
-                onChange={e => setMemberName(e.target.value)}
-                placeholder={t('auth.namePlaceholder')}
-                className="input pl-8 text-xs py-1.5"
-              />
-            </div>
-            <div className="relative">
-              <Mail className="w-3.5 h-3.5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
-              <input
-                type="email"
-                required
-                value={memberEmail}
-                onChange={e => setMemberEmail(e.target.value)}
-                placeholder={t('auth.emailPlaceholder')}
-                className="input pl-8 text-xs py-1.5"
-              />
-            </div>
-            <div className="relative">
-              <Lock className="w-3.5 h-3.5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
-              <input
-                type="password"
-                required
-                minLength={8}
-                value={memberPassword}
-                onChange={e => setMemberPassword(e.target.value)}
-                placeholder={t('security.tempPwdPlaceholder')}
-                className="input pl-8 text-xs py-1.5"
-              />
+          <form onSubmit={handleAddHouseholdMember} className="space-y-3 pt-3 border-t border-gray-100 dark:border-gray-800">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="relative">
+                <User className="w-3.5 h-3.5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  value={memberName}
+                  onChange={e => setMemberName(e.target.value)}
+                  placeholder={t('auth.namePlaceholder')}
+                  className="input pl-8 text-xs py-2"
+                />
+              </div>
+              <div className="relative">
+                <Mail className="w-3.5 h-3.5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="email"
+                  required
+                  value={memberEmail}
+                  onChange={e => setMemberEmail(e.target.value)}
+                  placeholder={t('auth.emailPlaceholder')}
+                  className="input pl-8 text-xs py-2"
+                />
+              </div>
+              <div className="relative">
+                <Lock className="w-3.5 h-3.5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="password"
+                  required
+                  minLength={8}
+                  value={memberPassword}
+                  onChange={e => setMemberPassword(e.target.value)}
+                  placeholder={t('security.tempPwdPlaceholder')}
+                  className="input pl-8 text-xs py-2"
+                />
+              </div>
             </div>
             <button
               type="submit"
               disabled={addingMember}
-              className="btn-secondary w-full text-xs py-2 font-semibold flex items-center justify-center gap-1.5"
+              className="btn-primary text-xs py-2 px-4 font-semibold flex items-center justify-center gap-1.5"
             >
               <UserPlus className="w-3.5 h-3.5" />
               <span>{t('security.addMemberBtn')}</span>
@@ -508,7 +519,7 @@ export default function SecurityManager() {
             </div>
           )}
         </div>
-      </div>
+      )}
     </div>
   )
 }
