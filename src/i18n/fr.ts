@@ -36,6 +36,7 @@ export const fr = {
   'nav.transactions': 'Transactions',
   'nav.import': 'Import CSV',
   'nav.settings': 'Paramètres',
+  'nav.security': 'Comptes et Sécurité',
   'nav.methodTitle': 'Méthode 55/25/20',
   'nav.methodSubtitle': 'Règle de budget active',
 
@@ -652,7 +653,11 @@ export const fr = {
   'auth.forceChangeConfirmBtn': 'Enregistrer mon mot de passe et continuer',
   'auth.errSameAsTempPassword': 'Votre nouveau mot de passe doit être différent du mot de passe temporaire.',
 
-  // ─── ACCOUNT & SECURITY SETTINGS TAB ────────────────────────────────────────
+  // ─── ACCOUNT & SECURITY PAGE ────────────────────────────────────────────────
+  'security.pageTitle': 'Comptes et Sécurité',
+  'security.pageSubtitle': 'Gérez votre compte personnel, vos accès de sécurité et les membres de votre foyer.',
+  'security.tabAccount': 'Mon compte',
+  'security.tabHousehold': 'Membres du foyer',
   'security.currentAccountTitle': 'Mon compte connecté',
   'security.currentAccountDesc': 'Session active sur ce navigateur. Tous les membres du foyer partagent le même budget.',
   'security.connectedAs': 'Connecté en tant que',

@@ -38,6 +38,7 @@ export const en: Record<TranslationKey, string> = {
   'nav.transactions': 'Transactions',
   'nav.import': 'CSV Import',
   'nav.settings': 'Settings',
+  'nav.security': 'Accounts & Security',
   'nav.methodTitle': '55/25/20 Method',
   'nav.methodSubtitle': 'Active budget rule',
 
@@ -654,7 +655,11 @@ export const en: Record<TranslationKey, string> = {
   'auth.forceChangeConfirmBtn': 'Save my password & continue',
   'auth.errSameAsTempPassword': 'Your new password must be different from the temporary password.',
 
-  // ─── ACCOUNT & SECURITY SETTINGS TAB ────────────────────────────────────────
+  // ─── ACCOUNT & SECURITY PAGE ────────────────────────────────────────────────
+  'security.pageTitle': 'Accounts & Security',
+  'security.pageSubtitle': 'Manage your personal account, security credentials, and household members.',
+  'security.tabAccount': 'My account',
+  'security.tabHousehold': 'Household members',
   'security.currentAccountTitle': 'My connected account',
   'security.currentAccountDesc': 'Active session on this browser. All household members share the same budget.',
   'security.connectedAs': 'Signed in as',

@@ -1,13 +1,15 @@
 import { NavLink } from 'react-router-dom'
-import { LayoutDashboard, List, Upload, Settings, TrendingUp, X, LogOut, User } from 'lucide-react'
+import { LayoutDashboard, List, Upload, Settings, ShieldCheck, TrendingUp, X, LogOut, User } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import LogoIcon from '@/components/ui/LogoIcon'
 import { useState, useEffect } from 'react'
 import { useTranslation } from '@/i18n'
 import { AuthUser, getCurrentUser, subscribeAuth, logoutUser } from '@/lib/auth'
+import { useStore } from '@/store/useStore'
 
 export default function Sidebar() {
-  const [mobileOpen, setMobileOpen] = useState(false)
+  const mobileOpen = useStore(s => s.mobileMenuOpen)
+  const setMobileOpen = useStore(s => s.setMobileMenuOpen)
   const [currentUser, setCurrentUser] = useState<AuthUser | null>(getCurrentUser())
   const { t } = useTranslation()
 
@@ -20,6 +22,7 @@ export default function Sidebar() {
     { to: '/transactions', icon: List, label: t('nav.transactions') },
     { to: '/import', icon: Upload, label: t('nav.import') },
     { to: '/settings', icon: Settings, label: t('nav.settings') },
+    { to: '/security', icon: ShieldCheck, label: t('nav.security') },
   ]
 
   return (
@@ -35,12 +38,12 @@ export default function Sidebar() {
       {/* Sidebar */}
       <aside
         className={cn(
-          'fixed md:static inset-y-0 left-0 z-50 flex flex-col w-64 bg-white dark:bg-gray-900 border-r border-gray-100 dark:border-gray-800 transition-transform duration-300 md:translate-x-0',
+          'fixed md:sticky md:top-0 inset-y-0 left-0 z-50 flex flex-col w-full md:w-64 h-screen max-h-screen overflow-y-auto bg-white dark:bg-gray-900 border-r border-gray-100 dark:border-gray-800 transition-transform duration-300 md:translate-x-0',
           mobileOpen ? 'translate-x-0' : '-translate-x-full'
         )}
       >
         {/* Logo */}
-        <div className="flex items-center justify-between h-16 px-6 border-b border-gray-100 dark:border-gray-800">
+        <div className="flex items-center justify-between h-16 px-6 border-b border-gray-100 dark:border-gray-800 shrink-0">
           <div className="flex items-center gap-2.5">
             <LogoIcon className="w-8 h-8 shadow-sm" />
             <div>
@@ -57,12 +60,13 @@ export default function Sidebar() {
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 p-4 space-y-1">
+        <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
           {NAV_ITEMS.map(({ to, icon: Icon, label }) => (
             <NavLink
               key={to}
               to={to}
               end={to === '/'}
+              onClick={() => setMobileOpen(false)}
               className={({ isActive }) =>
                 cn(
                   'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200',
@@ -79,7 +83,7 @@ export default function Sidebar() {
         </nav>
 
         {/* Footer */}
-        <div className="p-4 border-t border-gray-100 dark:border-gray-800 space-y-2">
+        <div className="p-4 border-t border-gray-100 dark:border-gray-800 space-y-2 shrink-0">
           {currentUser && (
             <div className="flex items-center justify-between gap-2 px-3 py-2 rounded-xl bg-gray-50 dark:bg-gray-800/80">
               <div className="flex items-center gap-2 min-w-0">
@@ -117,8 +121,12 @@ export default function Sidebar() {
 }
 
 export function SidebarToggle() {
+  const toggleMobileMenu = useStore(s => s.toggleMobileMenu)
   return (
-    <button className="md:hidden p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800">
+    <button
+      onClick={toggleMobileMenu}
+      className="md:hidden p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800"
+    >
       <LayoutDashboard className="w-5 h-5" />
     </button>
   )

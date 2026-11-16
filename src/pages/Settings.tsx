@@ -1,22 +1,22 @@
 import { useState, useEffect } from 'react'
-import { useSearchParams } from 'react-router-dom'
-import { Settings as SettingsIcon, Database, Receipt, Tag, Columns3, Sparkles, Languages, ShieldCheck } from 'lucide-react'
+import { useSearchParams, Navigate } from 'react-router-dom'
+import { Settings as SettingsIcon, Database, Receipt, Tag, Columns3, Sparkles, Languages } from 'lucide-react'
 import FixedExpensesManager from '@/components/settings/FixedExpensesManager'
 import BudgetRulesEditor from '@/components/settings/BudgetRulesEditor'
 import CategoriesTypesManager from '@/components/settings/CategoriesTypesManager'
 import SwimlaneRulesManager from '@/components/settings/SwimlaneRulesManager'
 import DataManagement from '@/components/settings/DataManagement'
-import SecurityManager from '@/components/settings/SecurityManager'
 import { useTranslation } from '@/i18n'
 import { Language } from '@/lib/types'
 
-type Tab = 'budget' | 'categories' | 'swimlanes' | 'depenses' | 'data' | 'security'
-const VALID_TABS: Tab[] = ['budget', 'categories', 'swimlanes', 'depenses', 'data', 'security']
+type Tab = 'budget' | 'categories' | 'swimlanes' | 'depenses' | 'data'
+const VALID_TABS: Tab[] = ['budget', 'categories', 'swimlanes', 'depenses', 'data']
 
 export default function Settings() {
   const { t, language, setLanguage } = useTranslation()
   const [searchParams, setSearchParams] = useSearchParams()
-  const paramTab = searchParams.get('tab') as Tab | null
+  const rawTab = searchParams.get('tab')
+  const paramTab = rawTab as Tab | null
   const [tab, setTab] = useState<Tab>(paramTab && VALID_TABS.includes(paramTab) ? paramTab : 'budget')
 
   useEffect(() => {
@@ -24,6 +24,10 @@ export default function Settings() {
       setTab(paramTab)
     }
   }, [paramTab, tab])
+
+  if (rawTab === 'security') {
+    return <Navigate to="/security" replace />
+  }
 
   const handleSelectTab = (id: Tab) => {
     setTab(id)
@@ -36,7 +40,6 @@ export default function Settings() {
     { id: 'swimlanes', label: t('settings.tabSwimlanes'), icon: Columns3 },
     { id: 'depenses', label: t('settings.tabFixed'), icon: Receipt },
     { id: 'data', label: t('settings.tabData'), icon: Database },
-    { id: 'security', label: t('settings.tabSecurity'), icon: ShieldCheck },
   ]
 
   const languages: { code: Language; label: string }[] = [
@@ -114,7 +117,6 @@ export default function Settings() {
       {tab === 'swimlanes' && <SwimlaneRulesManager />}
       {tab === 'depenses' && <FixedExpensesManager />}
       {tab === 'data' && <DataManagement />}
-      {tab === 'security' && <SecurityManager />}
     </div>
   )
 }

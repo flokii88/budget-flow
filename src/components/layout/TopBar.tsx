@@ -10,11 +10,10 @@ import pb from '@/lib/pocketbase'
 import { useTranslation } from '@/i18n'
 
 export default function TopBar() {
-  const { theme, setTheme, selectedMonth, setSelectedMonth } = useStore()
+  const { theme, setTheme, selectedMonth, setSelectedMonth, toggleMobileMenu } = useStore()
   const { t } = useTranslation()
   const queryClient = useQueryClient()
   const { data: transactions = [] } = useTransactions()
-  const [menuOpen, setMenuOpen] = useState(false)
   const [syncStatus, setSyncStatus] = useState<SyncStatus>({
     isOnline: false,
     isSyncing: false,
@@ -47,12 +46,12 @@ export default function TopBar() {
   }
 
   return (
-    <header className="h-16 px-4 md:px-6 flex items-center justify-between bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 sticky top-0 z-30">
+    <header className="h-16 shrink-0 px-4 md:px-6 flex items-center justify-between bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 sticky top-0 z-30">
       {/* Left: mobile menu + month nav */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2 sm:gap-3">
         <button
           className="md:hidden p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800"
-          onClick={() => setMenuOpen(!menuOpen)}
+          onClick={toggleMobileMenu}
         >
           <Menu className="w-5 h-5" />
         </button>
@@ -66,8 +65,8 @@ export default function TopBar() {
             <ChevronLeft className="w-4 h-4" />
           </button>
 
-          <div className="min-w-[160px] text-center">
-            <p className="text-sm font-semibold capitalize">
+          <div className="min-w-[110px] sm:min-w-[160px] text-center">
+            <p className="text-sm font-semibold capitalize truncate">
               {moisToLabel(selectedMonth)}
             </p>
           </div>
